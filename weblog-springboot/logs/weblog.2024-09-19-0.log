@@ -1,0 +1,38 @@
+2024-09-19 10:45:21.166 [main] INFO  com.swc.weblog.web.WeblogWebApplicationTests - Starting WeblogWebApplicationTests using Java 1.8.0_401 on Ethereal with PID 17700 (started by Summer Snow in E:\Code\Projects\weblog-springboot\weblog-web)
+2024-09-19 10:45:21.167 [main] INFO  com.swc.weblog.web.WeblogWebApplicationTests - The following profiles are active: prd
+2024-09-19 10:45:22.235 [main] INFO  com.swc.weblog.web.WeblogWebApplicationTests - Started WeblogWebApplicationTests in 1.507 seconds (JVM running for 2.284)
+2024-09-19 10:45:22.400 [main] INFO  com.swc.weblog.web.WeblogWebApplicationTests - 这是一行 Info 级别日志
+2024-09-19 10:45:22.400 [main] WARN  com.swc.weblog.web.WeblogWebApplicationTests - 这是一行 Warn 级别日志
+2024-09-19 10:45:22.402 [main] ERROR com.swc.weblog.web.WeblogWebApplicationTests - 这是一行 Error 级别日志
+2024-09-19 10:45:22.402 [main] INFO  com.swc.weblog.web.WeblogWebApplicationTests - 这是一行带有占位符日志，作者：swc
+[TraceId: ] 2024-09-19 11:34:32.644 [main] INFO  com.swc.weblog.web.WeblogWebApplication - Starting WeblogWebApplication using Java 1.8.0_401 on Ethereal with PID 28316 (E:\Code\Projects\weblog-springboot\weblog-web\target\classes started by Summer Snow in E:\Code\Projects\weblog-springboot)
+[TraceId: ] 2024-09-19 11:34:32.646 [main] INFO  com.swc.weblog.web.WeblogWebApplication - The following profiles are active: prd
+[TraceId: ] 2024-09-19 11:34:33.325 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8080 (http)
+[TraceId: ] 2024-09-19 11:34:33.332 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+[TraceId: ] 2024-09-19 11:34:33.332 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.56]
+[TraceId: ] 2024-09-19 11:34:33.402 [main] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+[TraceId: ] 2024-09-19 11:34:33.403 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 726 ms
+[TraceId: ] 2024-09-19 11:34:33.674 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port(s): 8080 (http) with context path ''
+[TraceId: ] 2024-09-19 11:34:33.680 [main] INFO  com.swc.weblog.web.WeblogWebApplication - Started WeblogWebApplication in 1.482 seconds (JVM running for 2.355)
+[TraceId: ] 2024-09-19 11:36:07.440 [http-nio-8080-exec-1] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+[TraceId: ] 2024-09-19 11:36:07.440 [http-nio-8080-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+[TraceId: ] 2024-09-19 11:36:07.441 [http-nio-8080-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+[TraceId: ] 2024-09-19 11:36:07.490 [http-nio-8080-exec-1] WARN  o.s.w.s.m.support.DefaultHandlerExceptionResolver - Resolved [org.springframework.http.converter.HttpMessageNotReadableException: Required request body is missing: public com.swc.weblog.web.model.User com.swc.weblog.web.controller.TestController.test(com.swc.weblog.web.model.User)]
+[TraceId: e7320bec-1eb9-459d-82c5-2b577d1a3f40] 2024-09-19 11:36:36.229 [http-nio-8080-exec-4] INFO  com.swc.weblog.common.aspect.ApiOperationLogAspect - ====== 请求开始: [测试接口], 入参: {"username":"admin","sex":1}, 请求类: TestController, 请求方法: test =================================== 
+[TraceId: e7320bec-1eb9-459d-82c5-2b577d1a3f40] 2024-09-19 11:36:36.238 [http-nio-8080-exec-4] INFO  com.swc.weblog.common.aspect.ApiOperationLogAspect - ====== 请求结束: [测试接口], 耗时: 16ms, 出参: {"username":"admin","sex":1} =================================== 
+[TraceId: ] 2024-09-19 12:19:30.446 [main] INFO  com.swc.weblog.web.WeblogWebApplication - Starting WeblogWebApplication using Java 1.8.0_401 on Ethereal with PID 27944 (E:\Code\Projects\weblog-springboot\weblog-web\target\classes started by Summer Snow in E:\Code\Projects\weblog-springboot)
+[TraceId: ] 2024-09-19 12:19:30.447 [main] INFO  com.swc.weblog.web.WeblogWebApplication - The following profiles are active: prd
+[TraceId: ] 2024-09-19 12:19:31.103 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8080 (http)
+[TraceId: ] 2024-09-19 12:19:31.109 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+[TraceId: ] 2024-09-19 12:19:31.109 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.56]
+[TraceId: ] 2024-09-19 12:19:31.186 [main] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+[TraceId: ] 2024-09-19 12:19:31.186 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 712 ms
+[TraceId: ] 2024-09-19 12:19:31.444 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port(s): 8080 (http) with context path ''
+[TraceId: ] 2024-09-19 12:19:31.450 [main] INFO  com.swc.weblog.web.WeblogWebApplication - Started WeblogWebApplication in 1.36 seconds (JVM running for 2.165)
+[TraceId: ] 2024-09-19 12:19:37.780 [http-nio-8080-exec-1] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+[TraceId: ] 2024-09-19 12:19:37.780 [http-nio-8080-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+[TraceId: ] 2024-09-19 12:19:37.781 [http-nio-8080-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+[TraceId: c15c8a59-b569-457b-a068-ab628c5459dd] 2024-09-19 12:19:37.921 [http-nio-8080-exec-1] INFO  com.swc.weblog.common.aspect.ApiOperationLogAspect - ====== 请求开始: [测试接口], 入参: {"username":"admin","sex":1,"age":null,"email":null}, org.springframework.validation.BeanPropertyBindingResult: 2 errors
+Field error in object 'user' on field 'email': rejected value [null]; codes [NotBlank.user.email,NotBlank.email,NotBlank.java.lang.String,NotBlank]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [user.email,email]; arguments []; default message [email]]; default message [邮箱不能为空]
+Field error in object 'user' on field 'age': rejected value [null]; codes [NotNull.user.age,NotNull.age,NotNull.java.lang.Integer,NotNull]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [user.age,age]; arguments []; default message [age]]; default message [年龄不能为空], 请求类: TestController, 请求方法: test =================================== 
+[TraceId: ] 2024-09-19 12:19:37.929 [http-nio-8080-exec-1] WARN  c.s.weblog.common.exception.GlobalExceptionHandler - /test request fail, errorCode: 20000, errorMessage: 该产品不存在（测试使用）
