@@ -3,13 +3,15 @@
         <!-- 卡片组件， shadow="never" 指定 card 卡片组件没有阴影 -->
         <el-card shadow="never">
             <el-form ref="formRef" :model="form" label-width="160px" :rules="rules">
+                <el-form-item>
+                    <h2 class="font-bold text-base mb-1">基础设置</h2>
+                </el-form-item>
                 <el-form-item label="博客名称" prop="name">
                     <el-input v-model="form.name" clearable />
                 </el-form-item>
                 <el-form-item label="作者名" prop="author">
                     <el-input v-model="form.author" clearable />
                 </el-form-item>
-
                 <el-form-item label="博客 LOGO" prop="logo">
                     <el-upload class="avatar-uploader" action="#" :on-change="handleLogoChange" :auto-upload="false"
                         :show-file-list="false">
@@ -30,6 +32,13 @@
                 </el-form-item>
                 <el-form-item label="介绍语" prop="introduction">
                     <el-input v-model="form.introduction" type="textarea" />
+                </el-form-item>
+
+                <!-- 分割线 -->
+                <el-divider />
+
+                <el-form-item>
+                    <h2 class="font-bold text-base mb-1">第三方平台设置</h2>
                 </el-form-item>
                 <!-- 开启 Github 访问 -->
                 <el-form-item label="开启 GihHub 访问">
@@ -66,6 +75,37 @@
                 <el-form-item label="CSDN 主页访问地址" v-if="isCSDNChecked">
                     <el-input v-model="form.csdnHomepage" clearable placeholder="请输入 CSDN 主页访问的 URL" />
                 </el-form-item>
+
+                <!-- 分割线 -->
+                <el-divider />
+
+                <el-form-item>
+                    <h2 class="font-bold text-base mb-1">评论设置</h2>
+                </el-form-item>
+                <el-form-item label="敏感词过滤">
+                    <el-switch v-model="form.isCommentSensiWordOpen" inline-prompt :active-icon="Check" :inactive-icon="Close"
+                    @change="sensiWordSwitchChange"/>
+                    <div class="flex items-center ml-3">
+                        <el-icon class="mr-2" color="#909399"><InfoFilled /></el-icon>
+                        <el-text class="mx-1" type="info"  size="small">开启后，系统自动对发表的每条评论进行敏感词过滤</el-text>
+                    </div>
+                </el-form-item>
+                <el-form-item label="开启审核">
+                    <el-switch v-model="form.isCommentExamineOpen" inline-prompt :active-icon="Check" :inactive-icon="Close"
+                    @change="examineSwitchChange"/>
+                    <div class="flex items-center ml-3">
+                        <el-icon class="mr-2" color="#909399"><InfoFilled /></el-icon>
+                        <el-text class="mx-1" type="info"  size="small">开启后，评论需要博主后台审核通过后，才会展示出来</el-text>
+                    </div>
+                </el-form-item>
+                <el-form-item label="博主邮箱">
+                    <el-input v-model="form.mail" clearable placeholder="请输入博主邮箱地址" />
+                    <div class="flex items-center">
+                        <el-icon class="mr-2" color="#909399"><InfoFilled /></el-icon>
+                        <el-text class="mx-1" type="info"  size="small">当被评论后，用于主动发送邮件通知博主</el-text>
+                    </div>
+                </el-form-item>
+
                 <el-form-item>
                     <el-button type="primary" :loading="btnLoading" @click="onSubmit">保存</el-button>
                 </el-form-item>
@@ -80,6 +120,20 @@ import { Check, Close } from '@element-plus/icons-vue'
 import { getBlogSettingsDetail, updateBlogSettings } from '@/api/admin/blogsettings'
 import { uploadFile } from '@/api/admin/file'
 import { showMessage } from '@/composables/util'
+
+// 是否开启 GitHub
+const isGithubChecked = ref(false)
+// 是否开启 Gitee
+const isGiteeChecked = ref(false)
+// 是否开启知乎
+const isZhihuChecked = ref(false)
+// 是否开启 CSDN
+const isCSDNChecked = ref(false)
+// 是否显示保存按钮的 loading 状态，默认为 false
+const btnLoading = ref(false)
+
+// 表单引用
+const formRef = ref(null)
 // 表单对象
 const form = reactive({
     name: '',
@@ -91,15 +145,10 @@ const form = reactive({
     giteeHomepage: '',
     zhihuHomepage: '',
     csdnHomepage: '',
+    isCommentSensiWordOpen: true, // 是否开启评论敏感词过滤
+    isCommentExamineOpen: false, // 是否开启评论审核
+    mail: '' // 博主邮箱
 })
-// 是否开启 GitHub
-const isGithubChecked = ref(false)
-// 是否开启 Gitee
-const isGiteeChecked = ref(false)
-// 是否开启知乎
-const isZhihuChecked = ref(false)
-// 是否开启 CSDN
-const isCSDNChecked = ref(false)
 
 // 规则校验
 const rules = {
@@ -137,11 +186,11 @@ const csdnSwitchChange = (checked) => {
         form.csdnHomepage = ''
     }
 }
+
 // 初始化博客设置数据，并渲染到页面上
 function initBlogSettings() {
-    // 请求后台接口
     getBlogSettingsDetail().then((e) => {
-        if (e.success == true) {
+        if (e.success) {
             // 设置表单数据
             form.name = e.data.name
             form.author = e.data.author
@@ -149,7 +198,7 @@ function initBlogSettings() {
             form.avatar = e.data.avatar
             form.introduction = e.data.introduction
 
-            // 第三方平台信息设置，先判断后端返回平台链接是否为空，若不为空，则将 switch 组件置为选中状态，并设置表单对应数据
+            // 第三方平台信息设置
             if (e.data.githubHomepage) {
                 isGithubChecked.value = true
                 form.githubHomepage = e.data.githubHomepage
@@ -169,11 +218,15 @@ function initBlogSettings() {
                 isCSDNChecked.value = true
                 form.csdnHomepage = e.data.csdnHomepage
             }
+
+            form.isCommentSensiWordOpen = e.data.isCommentSensiWordOpen
+            form.isCommentExamineOpen = e.data.isCommentExamineOpen
+            form.mail = e.data.mail
         }
     })
 }
-// 手动调用一下初始化方法
 initBlogSettings()
+
 // 上传 logo 图片
 const handleLogoChange = (file) => {
     // 表单对象
@@ -193,6 +246,7 @@ const handleLogoChange = (file) => {
         showMessage('上传成功')
     })
 }
+
 // 上传作者头像
 const handleAvatarChange = (file) => {
     // 表单对象
@@ -212,11 +266,6 @@ const handleAvatarChange = (file) => {
         showMessage('上传成功')
     })
 }
-// 是否显示保存按钮的 loading 状态，默认为 false
-const btnLoading = ref(false)
-
-// 表单引用
-const formRef = ref(null)
 
 // 保存当前博客设置
 const onSubmit = () => {
@@ -237,14 +286,22 @@ const onSubmit = () => {
                 showMessage(message, 'error')
                 return
             }
-
+            
             // 重新渲染页面中的信息
             initBlogSettings()
             showMessage('保存成功')
         }).finally(() => btnLoading.value = false) // 隐藏保存按钮 loading
     })
 }
+
+// 评论敏感词过滤 switch 组件 change 事件
+const sensiWordSwitchChange = (checked) => form.isCommentSensiWordOpen = checked
+// 评论审核 switch 组件 change 事件
+const examineSwitchChange = (checked) => form.isCommentExamineOpen = checked
+
+
 </script>
+
 <style scoped>
 .avatar-uploader .avatar {
     width: 100px;
