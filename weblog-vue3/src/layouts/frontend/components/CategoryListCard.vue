@@ -59,19 +59,12 @@ dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 dark:focus:ring-gray-
     </div>
 </template>
 
+
 <script setup>
 import { getCategoryList } from '@/api/frontend/category'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-// 所有分类
-const categories = ref([])
-getCategoryList().then((res) => {
-    if (res.success) {
-        categories.value = res.data
-    }
-})
-// 引入路由
 const router = useRouter()
 
 // 跳转分类文章列表页
@@ -80,10 +73,12 @@ const goCategoryArticleListPage = (id, name) => {
     router.push({ path: '/category/article/list', query: { id, name } })
 }
 
+// 所有分类
+const categories = ref([])
 // 一次显示的分类数
 const size = ref(10)
 
-getCategoryList({}).then((res) => {
+getCategoryList({ size: size.value }).then((res) => {
     if (res.success) {
         categories.value = res.data
     }
