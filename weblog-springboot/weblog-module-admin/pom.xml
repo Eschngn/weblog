@@ -83,6 +83,7 @@
             <artifactId>weblog-module-search</artifactId>
         </dependency>
 
+
     </dependencies>
 
 </project>
