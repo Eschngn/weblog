@@ -39,7 +39,7 @@ public class ArchiveServiceImpl implements ArchiveService {
         Long size = findArchiveArticlePageListReqVO.getSize();
 
         // 分页查询
-        Page<ArticleDO> page = articleMapper.selectPageList(current, size, null, null, null);
+        Page<ArticleDO> page = articleMapper.selectPageList(current, size, null, null, null,null);
         List<ArticleDO> articleDOS = page.getRecords();
 
         List<FindArchiveArticlePageListRspVO> vos=Lists.newArrayList();

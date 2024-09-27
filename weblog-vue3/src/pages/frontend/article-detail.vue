@@ -1,5 +1,6 @@
 <template>
     <Header></Header>
+
     <!-- 文章标题、标签、Meta 信息 -->
     <div class="bg-white dark:bg-gray-900">
         <div class="max-w-screen-xl flex flex-col flex-wrap mx-auto px-4 md:px-6 pb-14 pt-10">
@@ -12,15 +13,14 @@
                     # {{ tag.name }}
                 </span>
             </div>
-
+            
             <!-- 文章标题 -->
             <h1 class="font-bold text-4xl md:text-5xl mb-8 dark:text-white">{{ article.title }}</h1>
 
             <!-- Meta 信息 -->
             <div class="flex gap-3 md:gap-6 text-gray-400 items-center text-sm">
                 <!-- 字数 -->
-                <div class="flex items-center" data-tooltip-target="word-tooltip-bottom"
-                    data-tooltip-placement="bottom">
+                <div class="flex items-center" data-tooltip-target="word-tooltip-bottom" data-tooltip-placement="bottom">
                     <svg t="1701512226243" class="w-4 h-4 mr-1 icon" viewBox="0 0 1024 1024" version="1.1"
                         xmlns="http://www.w3.org/2000/svg" p-id="28617" width="48" height="48">
                         <path
@@ -118,7 +118,7 @@
     </div>
 
     <!-- 主内容区域 -->
-    <main class="container max-w-screen-xl mx-auto p-4 px-6">
+    <main class="container max-w-screen-xl mx-auto px-4 md:px-6 py-4">
         <!-- grid 表格布局，分为 4 列 -->
         <div class="grid grid-cols-4 gap-7">
             <!-- 左边栏，占用 3 列 -->
@@ -126,25 +126,11 @@
                 <!-- 文章卡片父容器 -->
                 <div
                     class="w-full p-5 mb-3 bg-white border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700">
-
-
                     <!-- 文章 -->
                     <article>
-
-
-                       <!-- 正文 -->
-                       <div :class="{ 'dark': isDark }">
+                        <!-- 正文 -->
+                        <div :class="{ 'dark': isDark }">
                             <div ref="articleContentRef" class="mt-5 article-content" v-viewer v-html="article.content"></div>
-                        </div>
-
-
-                        <!-- 标签集合 -->
-                        <div v-if="article.tags && article.tags.length > 0" class="mt-5">
-                            <span @click="goTagArticleListPage(tag.id, tag.name)" v-for="(tag, index) in article.tags"
-                                :key="index"
-                                class="inline-block mb-1 cursor-pointer bg-green-100 text-green-800 text-xs font-medium mr-2 px-3 py-1 rounded-full hover:bg-green-200 hover:text-green-900 dark:bg-green-900 dark:text-green-300">
-                                # {{ tag.name }}
-                            </span>
                         </div>
 
                         <!-- 上下篇 -->
@@ -187,7 +173,11 @@
                     </article>
 
 
+
                 </div>
+
+                <!-- 评论组件 -->
+                <Comment></Comment>
             </div>
 
             <!-- 右边侧边栏，占用一列 -->
@@ -202,12 +192,14 @@
                     <!-- 标签 -->
                     <TagListCard></TagListCard>
                 </div>
+                
                 <!-- 文章目录 -->
                 <Toc></Toc>
+
             </aside>
         </div>
-
     </main>
+
     <!-- 返回顶部 -->
     <ScrollToTopButton></ScrollToTopButton>
 
@@ -220,33 +212,34 @@ import Footer from '@/layouts/frontend/components/Footer.vue'
 import UserInfoCard from '@/layouts/frontend/components/UserInfoCard.vue'
 import TagListCard from '@/layouts/frontend/components/TagListCard.vue'
 import CategoryListCard from '@/layouts/frontend/components/CategoryListCard.vue'
+import ScrollToTopButton from '@/layouts/frontend/components/ScrollToTopButton.vue'
+import Toc from '@/layouts/frontend/components/Toc.vue'
 import { getArticleDetail } from '@/api/frontend/article'
 import { useRoute, useRouter } from 'vue-router'
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import hljs from 'highlight.js'
-import ScrollToTopButton from '@/layouts/frontend/components/ScrollToTopButton.vue'
-// 代码高亮样式
 import 'highlight.js/styles/tokyo-night-dark.css'
-import Toc from '@/layouts/frontend/components/Toc.vue'
 import { initTooltips } from 'flowbite'
-import { nextTick } from 'vue'
+import Comment from '@/components/Comment.vue'
+
 import { useDark } from '@vueuse/core'
 
-
-const route = useRoute()
-const router = useRouter()
 // 是否是暗黑模式
 const isDark = useDark()
+
 // 初始化 Flowbit 组件
 onMounted(() => {
     initTooltips();
 })
+
+const route = useRoute()
+const router = useRouter()
 // 路由传递过来的文章 ID
 console.log(route.params.articleId)
 
 // 文章数据
 const article = ref({})
-let copyCodeBtn = '<button class="hidden copy-code-btn flex items-center justify-center"><div class="copy-icon"></div></button>'
+
 // 获取文章详情
 function refreshArticleDetail(articleId) {
     getArticleDetail(route.params.articleId).then((res) => {
@@ -267,6 +260,7 @@ function refreshArticleDetail(articleId) {
                 hljs.highlightElement(block)
             })
 
+            // 获取所有的 pre 节点
             let preElements = document.querySelectorAll('pre')
             preElements.forEach(preElement => {
                 // 找到第一个 code 元素
@@ -293,36 +287,9 @@ function refreshArticleDetail(articleId) {
                 preElement.addEventListener('mouseleave', handleMouseLeave);
             })
         })
-        
-        // 复制内容到剪切板
-        function copyToClipboard(text) {
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
-        }
-        const handleMouseEnter = (event) => {
-            // 鼠标移入，显示按钮
-            let copyBtn = event.target.querySelector('button');
-            if (copyBtn) {
-                copyBtn.classList.remove('hidden');
-                copyBtn.classList.add('block');
-            }
-    	}
-
-        const handleMouseLeave = (event) => {
-            // 鼠标移出，隐藏按钮
-            let copyBtn = event.target.querySelector('button');
-            if (copyBtn) {
-                copyBtn.classList.add('hidden');
-            }
-        }
     })
 }
 refreshArticleDetail(route.params.articleId)
-
 
 // 跳转分类文章列表页
 const goCategoryArticleListPage = (id, name) => {
@@ -342,17 +309,42 @@ watch(route, (newRoute, oldRoute) => {
     refreshArticleDetail(newRoute.params.articleId)
 })
 
+// 复制内容到剪切板
+function copyToClipboard(text) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+}
 
+const handleMouseEnter = (event) => {
+    // 鼠标移入，显示按钮
+    let copyBtn = event.target.querySelector('button');
+    if (copyBtn) {
+        copyBtn.classList.remove('hidden');
+        copyBtn.classList.add('block');
+    }
+}
 
+const handleMouseLeave = (event) => {
+    // 鼠标移出，隐藏按钮
+    let copyBtn = event.target.querySelector('button');
+    if (copyBtn) {
+        copyBtn.classList.add('hidden');
+    }
+}
 </script>
+
 <style scoped>
 /* h1, h2, h3, h4, h5, h6 标题样式 */
 ::v-deep(.article-content h1,
-    .article-content h2,
-    .article-content h3,
-    .article-content h4,
-    .article-content h5,
-    .article-content h6) {
+.article-content h2,
+.article-content h3,
+.article-content h4,
+.article-content h5,
+.article-content h6) {
     color: #292525;
     line-height: 150%;
     font-family: PingFang SC, Helvetica Neue, Helvetica, Hiragino Sans GB, Microsoft YaHei, "\5FAE\8F6F\96C5\9ED1", Arial, sans-serif;
@@ -370,11 +362,23 @@ watch(route, (newRoute, oldRoute) => {
     padding-bottom: 15px;
 }
 
+::v-deep(.dark .article-content h2) {
+    --tw-text-opacity: 1;
+    color: rgb(226 232 240/var(--tw-text-opacity));
+    border-bottom: 1px solid;
+    border-color: rgb(55 65 81 / 1);
+}
+
 ::v-deep(.article-content h3) {
     font-size: 20px;
     margin-top: 40px;
     margin-bottom: 16px;
     font-weight: 600;
+}
+
+::v-deep(.dark .article-content h3) {
+    --tw-text-opacity: 1;
+    color: rgb(226 232 240/var(--tw-text-opacity));
 }
 
 ::v-deep(.article-content h4) {
@@ -384,6 +388,11 @@ watch(route, (newRoute, oldRoute) => {
     font-weight: 600;
 }
 
+::v-deep(.dark .article-content h4) {
+    --tw-text-opacity: 1;
+    color: rgb(226 232 240/var(--tw-text-opacity));
+}
+
 ::v-deep(.article-content h5) {
     font-size: 16px;
     margin-top: 30px;
@@ -391,11 +400,21 @@ watch(route, (newRoute, oldRoute) => {
     font-weight: 600;
 }
 
+::v-deep(.dark .article-content h5) {
+    --tw-text-opacity: 1;
+    color: rgb(226 232 240/var(--tw-text-opacity));
+}
+
 ::v-deep(.article-content h6) {
     font-size: 16px;
     margin-top: 30px;
     margin-bottom: 14px;
     font-weight: 600;
+}
+
+::v-deep(.dark .article-content h6) {
+    --tw-text-opacity: 1;
+    color: rgb(226 232 240/var(--tw-text-opacity));
 }
 
 /* p 段落样式 */
@@ -410,6 +429,10 @@ watch(route, (newRoute, oldRoute) => {
     font-family: -apple-system, BlinkMacSystemFont, PingFang SC, Hiragino Sans GB, Microsoft Yahei, Arial, sans-serif;
 }
 
+::v-deep(.dark .article-content p) {
+    color: #9e9e9e;
+}
+
 /* blockquote 引用样式 */
 ::v-deep(.article-content blockquote) {
     border-left: 2.3px solid rgb(52, 152, 219);
@@ -419,6 +442,17 @@ watch(route, (newRoute, oldRoute) => {
     font-size: 16px;
     margin-bottom: 20px;
     padding: 24px;
+}
+
+::v-deep(.dark .article-content blockquote) {
+    quotes: none;
+    --tw-bg-opacity: 1;
+    background-color: rgb(31 41 55 / var(--tw-bg-opacity));
+    border-left: 2.3px solid #555;
+    color: #666;
+    font-size: 16px;
+    margin-bottom: 20px;
+    padding: 0.25rem 0 0.25rem 1rem;
 }
 
 /* 设置 blockquote 中最后一个 p 标签的 margin-bottom 为 0 */
@@ -445,6 +479,11 @@ watch(route, (newRoute, oldRoute) => {
     padding-left: 2rem;
 }
 
+::v-deep(.dark .article-content ul) {
+    padding-left: 2rem;
+    color: #9e9e9e;
+}
+
 ::v-deep(.article-content > ul) {
     margin-bottom: 20px;
 }
@@ -457,7 +496,7 @@ watch(route, (newRoute, oldRoute) => {
 }
 
 ::v-deep(.article-content ul li p) {
-    margin-bottom: 0 !important;
+    margin-bottom: 0!important;
 }
 
 ::v-deep(.article-content ul ul li) {
@@ -470,6 +509,10 @@ watch(route, (newRoute, oldRoute) => {
     padding-left: 2rem;
 }
 
+::v-deep(.dark .article-content ol) {
+    color: #9e9e9e;
+}
+
 /* 图片样式 */
 ::v-deep(.article-content img) {
     max-width: 100%;
@@ -480,7 +523,7 @@ watch(route, (newRoute, oldRoute) => {
 }
 
 ::v-deep(.article-content img:hover,
-    img:focus) {
+img:focus) {
     box-shadow: 2px 2px 10px 0 rgba(0, 0, 0, .15);
 }
 
@@ -508,44 +551,13 @@ watch(route, (newRoute, oldRoute) => {
     font-family: Operator Mono, Consolas, Monaco, Menlo, monospace;
 }
 
-/* 表格样式 */
-::v-deep(table) {
-    margin-bottom: 20px;
-    width: 100%;
-}
-
-::v-deep(table tr) {
-    background-color: #fff;
-    border-top: 1px solid #c6cbd1;
-}
-
-::v-deep(table th) {
-    padding: 6px 13px;
-    border: 1px solid #dfe2e5;
-}
-
-::v-deep(table td) {
-    padding: 6px 13px;
-    border: 1px solid #dfe2e5;
-}
-
-::v-deep(table tr:nth-child(2n)) {
-    background-color: #f6f8fa;
-}
-
-/* hr 横线 */
-::v-deep(hr) {
-    margin-bottom: 20px;
-}
-
-/* code 样式 */
-::v-deep(.article-content code:not(pre code)) {
+::v-deep(.dark .article-content code:not(pre code)) {
     padding: 2px 4px;
     margin: 0 2px;
-    font-size: 95% !important;
-    border-radius: 4px;
-    color: rgb(41, 128, 185);
-    background-color: rgba(27, 31, 35, 0.05);
+    font-size: .85em;
+    border-radius: 5px;
+    color: #abb2bf;
+    background: #333;
     font-family: Operator Mono, Consolas, Monaco, Menlo, monospace;
 }
 
@@ -578,6 +590,61 @@ watch(route, (newRoute, oldRoute) => {
     margin-left: 10px;
     position: absolute;
     width: 10px;
+}
+
+/* 表格样式 */
+::v-deep(table) {
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+::v-deep(table tr) {
+    background-color: #fff;
+    border-top: 1px solid #c6cbd1;
+}
+
+::v-deep(table th) {
+    padding: 6px 13px;
+    border: 1px solid #dfe2e5;
+}
+
+::v-deep(table td) {
+    padding: 6px 13px;
+    border: 1px solid #dfe2e5;
+}
+
+::v-deep(table tr:nth-child(2n)) {
+    background-color: #f6f8fa;
+}
+
+::v-deep(.dark table tr) {
+    background-color: rgb(31 41 55 / 1);
+}
+
+::v-deep(.dark table) {
+    color: #9e9e9e;
+}
+
+::v-deep(.dark table th) {
+    border: 1px solid #394048;
+}
+
+::v-deep(.dark table td) {
+    border: 1px solid #394048;
+}
+
+::v-deep(.dark table tr:nth-child(2n)) {
+    background-color: rgb(21 41 55 / 1);
+}
+
+/* hr 横线 */
+::v-deep(hr) {
+    margin-bottom: 20px;
+}
+
+::v-deep(.dark hr) {
+    --tw-border-opacity: 1;
+    border-color: rgb(55 65 81 / var(--tw-border-opacity));
 }
 
 ::v-deep(.copy-code-btn) {
@@ -617,126 +684,33 @@ watch(route, (newRoute, oldRoute) => {
     color: #9e9e9e;
     font-size: 1.25rem;
 }
+
 ::v-deep(.copied) {
-            display: flex;
-            background: #2f3542;
-        }
-
-        ::v-deep(.copied:after) {
-            content: "已复制";
-            position: absolute;
-            top: 0;
-            right: calc(100% + .25rem);
-            display: block;
-            height: 2.5rem;
-            padding: .625rem;
-            border-radius: .5rem;
-            background: #2f3542;
-            color: #9e9e9e;
-            font-weight: 500;
-            line-height: 1.25rem;
-            white-space: nowrap;
-            font-size: 14px;
-            font-family: -apple-system, BlinkMacSystemFont, PingFang SC, Hiragino Sans GB, Microsoft Yahei, Arial, sans-serif;
-        }
-
-        ::v-deep(.copied .copy-icon) {
-            --copied-icon: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' height='20' width='20' stroke='rgba(128,128,128,1)' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m-6 9 2 2 4-4'/%3E%3C/svg%3E");
-            -webkit-mask-image: var(--copied-icon);
-            mask-image: var(--copied-icon);
-        }
-        /* h1, h2, h3, h4, h5, h6 标题样式 */
-::v-deep(.dark .article-content h2) {
-    --tw-text-opacity: 1;
-    color: rgb(226 232 240/var(--tw-text-opacity));
-    border-bottom: 1px solid;
-    border-color: rgb(55 65 81 / 1);
+    display: flex;
+    background: #2f3542;
 }
 
-::v-deep(.dark .article-content h3) {
-    --tw-text-opacity: 1;
-    color: rgb(226 232 240/var(--tw-text-opacity));
-}
-
-::v-deep(.dark .article-content h4) {
-    --tw-text-opacity: 1;
-    color: rgb(226 232 240/var(--tw-text-opacity));
-}
-
-::v-deep(.dark .article-content h5) {
-    --tw-text-opacity: 1;
-    color: rgb(226 232 240/var(--tw-text-opacity));
-}
-
-::v-deep(.dark .article-content h6) {
-    --tw-text-opacity: 1;
-    color: rgb(226 232 240/var(--tw-text-opacity));
-}
-
-/* p 段落样式 */
-::v-deep(.dark .article-content p) {
+::v-deep(.copied:after) {
+    content: "已复制";
+    position: absolute;
+    top: 0;
+    right: calc(100% + .25rem);
+    display: block;
+    height: 2.5rem;
+    padding: .625rem;
+    border-radius: .5rem;
+    background: #2f3542;
     color: #9e9e9e;
+    font-weight: 500;
+    line-height: 1.25rem;
+    white-space: nowrap;
+    font-size: 14px;
+    font-family: -apple-system, BlinkMacSystemFont, PingFang SC, Hiragino Sans GB, Microsoft Yahei, Arial, sans-serif;
 }
 
-/* blockquote 引用样式 */
-::v-deep(.dark .article-content blockquote) {
-    quotes: none;
-    --tw-bg-opacity: 1;
-    background-color: rgb(31 41 55 / var(--tw-bg-opacity));
-    border-left: 2.3px solid #555;
-    color: #666;
-    font-size: 16px;
-    margin-bottom: 20px;
-    padding: 0.25rem 0 0.25rem 1rem;
-}
-
-/* ul 样式 */
-::v-deep(.dark .article-content ul) {
-    padding-left: 2rem;
-    color: #9e9e9e;
-}
-
-/* ol 样式 */
-::v-deep(.dark .article-content ol) {
-    color: #9e9e9e;
-}
-
-/* code 样式 */
-::v-deep(.dark .article-content code:not(pre code)) {
-    padding: 2px 4px;
-    margin: 0 2px;
-    font-size: .85em;
-    border-radius: 5px;
-    color: #abb2bf;
-    background: #333;
-    /* background-color: rgba(27, 31, 35, 0.05); */
-    font-family: Operator Mono, Consolas, Monaco, Menlo, monospace;
-}
-
-/* 表格样式 */
-::v-deep(.dark table tr) {
-    background-color: rgb(31 41 55 / 1);
-}
-
-::v-deep(.dark table) {
-    color: #9e9e9e;
-}
-
-::v-deep(.dark table th) {
-    border: 1px solid #394048;
-}
-
-::v-deep(.dark table td) {
-    border: 1px solid #394048;
-}
-
-::v-deep(.dark table tr:nth-child(2n)) {
-    background-color: rgb(21 41 55 / 1);
-}
-
-/* hr 横线 */
-::v-deep(.dark hr) {
-    --tw-border-opacity: 1;
-    border-color: rgb(55 65 81 / var(--tw-border-opacity));
+::v-deep(.copied .copy-icon) {
+    --copied-icon: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' height='20' width='20' stroke='rgba(128,128,128,1)' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m-6 9 2 2 4-4'/%3E%3C/svg%3E");
+    -webkit-mask-image: var(--copied-icon);
+    mask-image: var(--copied-icon);
 }
 </style>
