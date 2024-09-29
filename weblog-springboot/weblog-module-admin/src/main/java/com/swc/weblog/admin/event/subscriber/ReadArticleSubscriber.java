@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.time.LocalDate;
 
@@ -18,14 +20,15 @@ import java.time.LocalDate;
  */
 @Component
 @Slf4j
-public class ReadArticleSubscriber implements ApplicationListener<ReadArticleEvent> {
+public class ReadArticleSubscriber  {
     @Autowired
     private ArticleMapper articleMapper;
     @Autowired
     private StatisticsArticlePVMapper articlePVMapper;
 
-    @Override
+
     @Async("threadPoolTaskExecutor")
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onApplicationEvent(ReadArticleEvent event) {
         // 在这里处理收到的事件，可以是任何逻辑操作
         Long articleId = event.getArticleId();

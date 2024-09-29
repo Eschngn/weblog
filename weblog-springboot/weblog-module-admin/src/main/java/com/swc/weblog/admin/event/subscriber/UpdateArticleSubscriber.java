@@ -19,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 /**
  * @author Wilson
@@ -27,7 +29,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-public class UpdateArticleSubscriber implements ApplicationListener<UpdateArticleEvent> {
+public class UpdateArticleSubscriber{
 
     @Autowired
     private LuceneHelper luceneHelper;
@@ -39,11 +41,11 @@ public class UpdateArticleSubscriber implements ApplicationListener<UpdateArticl
     private AdminStatisticsService statisticsService;
 
 
-    @SneakyThrows
-    @Override
+    //@SneakyThrows
     @Async("threadPoolTaskExecutor")
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onApplicationEvent(UpdateArticleEvent event) {
-        Thread.sleep(100);
+        //Thread.sleep(100);
         // 在这里处理收到的事件，可以是任何逻辑操作
         Long articleId = event.getArticleId();
 
