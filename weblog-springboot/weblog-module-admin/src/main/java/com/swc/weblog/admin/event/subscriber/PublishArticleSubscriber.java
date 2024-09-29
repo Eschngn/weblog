@@ -9,6 +9,7 @@ import com.swc.weblog.common.domain.mapper.ArticleContentMapper;
 import com.swc.weblog.common.domain.mapper.ArticleMapper;
 import com.swc.weblog.search.LuceneHelper;
 import com.swc.weblog.search.index.ArticleIndex;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -36,9 +37,11 @@ public class PublishArticleSubscriber implements ApplicationListener<PublishArti
     @Autowired
     private AdminStatisticsService statisticsService;
 
+    @SneakyThrows
     @Override
     @Async("threadPoolTaskExecutor")
     public void onApplicationEvent(PublishArticleEvent event) {
+        Thread.sleep(100);
         // 在这里处理收到的事件，可以是任何逻辑操作
         Long articleId = event.getArticleId();
 

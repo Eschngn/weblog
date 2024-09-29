@@ -29,7 +29,6 @@
                     写文章</el-button>
             </div>
 
-
             <!-- 分页列表 -->
             <el-table :data="tableData" border stripe style="width: 100%" v-loading="tableLoading">
                 <el-table-column prop="id" label="ID" width="50" />
@@ -58,7 +57,7 @@
                                 <Edit />
                             </el-icon>
                             编辑</el-button>
-                        <el-button size="small" @click="goArticleDetailPage(scope.row.id)">
+                            <el-button size="small" @click="goArticleDetailPage(scope.row.id)">
                             <el-icon class="mr-1">
                                 <View />
                             </el-icon>
@@ -81,8 +80,10 @@
             </div>
 
         </el-card>
+
         <!-- 写博客 -->
-        <el-dialog v-model="isArticlePublishEditorShow" :fullscreen="true" :show-close="false">
+        <el-dialog v-model="isArticlePublishEditorShow" :fullscreen="true" :show-close="false"
+            :close-on-press-escape="false">
             <template #header="{ close, titleId, titleClass }">
                 <!-- 固钉组件，固钉到顶部 -->
                 <el-affix :offset="20" style="width: 100%;">
@@ -128,8 +129,7 @@
                 </el-form-item>
                 <el-form-item label="分类" prop="categoryId">
                     <el-select v-model="form.categoryId" clearable placeholder="---请选择---" size="large">
-                        <el-option v-for="item in categories" :key="item.value" :label="item.label"
-                            :value="item.value" />
+                        <el-option v-for="item in categories" :key="item.value" :label="item.label" :value="item.value" />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="标签" prop="tags">
@@ -144,6 +144,7 @@
                 </el-form-item>
             </el-form>
         </el-dialog>
+
         <!-- 编辑博客 -->
         <el-dialog v-model="isArticleUpdateEditorShow" :fullscreen="true" :show-close="false"
             :close-on-press-escape="false">
@@ -168,8 +169,7 @@
                 </el-affix>
             </template>
             <!-- label-position="top" 用于指定 label 元素在上面 -->
-            <el-form :model="updateArticleForm" ref="updateArticleFormRef" label-position="top" size="large"
-                :rules="rules">
+            <el-form :model="updateArticleForm" ref="updateArticleFormRef" label-position="top" size="large" :rules="rules">
                 <el-form-item label="标题" prop="title">
                     <el-input v-model="updateArticleForm.title" autocomplete="off" size="large" maxlength="40"
                         show-word-limit clearable />
@@ -180,8 +180,8 @@
                         editorId="updateArticleEditor" />
                 </el-form-item>
                 <el-form-item label="封面" prop="cover">
-                    <el-upload class="avatar-uploader" action="#" :on-change="handleUpdateCoverChange"
-                        :auto-upload="false" :show-file-list="false">
+                    <el-upload class="avatar-uploader" action="#" :on-change="handleUpdateCoverChange" :auto-upload="false"
+                        :show-file-list="false">
                         <img v-if="updateArticleForm.cover" :src="updateArticleForm.cover" class="avatar" />
                         <el-icon v-else class="avatar-uploader-icon">
                             <Plus />
@@ -194,8 +194,7 @@
                 </el-form-item>
                 <el-form-item label="分类" prop="categoryId">
                     <el-select v-model="updateArticleForm.categoryId" clearable placeholder="---请选择---" size="large">
-                        <el-option v-for="item in categories" :key="item.value" :label="item.label"
-                            :value="item.value" />
+                        <el-option v-for="item in categories" :key="item.value" :label="item.label" :value="item.value" />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="标签" prop="tags">
@@ -210,98 +209,29 @@
                 </el-form-item>
             </el-form>
         </el-dialog>
-
     </div>
 </template>
 
 <script setup>
 import { ref, reactive } from 'vue'
-import { Search, RefreshRight } from '@element-plus/icons-vue'
-import moment from 'moment'
-import { MdEditor } from 'md-editor-v3'
-import 'md-editor-v3/lib/style.css'
+import { Search, RefreshRight, Check, Close } from '@element-plus/icons-vue'
+import { getArticlePageList, deleteArticle, publishArticle, getArticleDetail, updateArticle, updateArticleIsTop } from '@/api/admin/article'
 import { uploadFile } from '@/api/admin/file'
 import { getCategorySelectList } from '@/api/admin/category'
 import { searchTags, getTagSelectList } from '@/api/admin/tag'
-
-import { getArticlePageList, deleteArticle, publishArticle, getArticleDetail, updateArticle } from '@/api/admin/article'
+import moment from 'moment'
 import { showMessage, showModel } from '@/composables/util'
+import { MdEditor } from 'md-editor-v3'
+import 'md-editor-v3/lib/style.css'
 import { useRouter } from 'vue-router'
-import { Check, Close } from '@element-plus/icons-vue'
-import { updateArticleIsTop } from '@/api/admin/article'
-// 点击置顶事件
-const handleIsTopChange = (row) => {
-    updateArticleIsTop({id: row.id, isTop: row.isTop}).then((res) => {
-        // 重新请求分页接口，渲染列表数据
-        getTableData()
 
-        if (res.success == false) {
-            // 获取服务端返回的错误消息
-            let message = res.message
-            // 提示错误消息
-            showMessage(message, 'error')
-            return
-        }
-
-        showMessage(row.isTop ? '置顶成功' : "已取消置顶")
-    })
-}
 const router = useRouter()
-// 是否显示编辑文章对话框
-const isArticleUpdateEditorShow = ref(false)
-// 编辑文章表单引用
-const updateArticleFormRef = ref(null)
-// 删除文章
-const deleteArticleSubmit = (row) => {
-    console.log(row)
-    showModel('是否确定要删除该文章？').then(() => {
-        deleteArticle(row.id).then((res) => {
-            if (res.success == false) {
-                // 获取服务端返回的错误消息
-                let message = res.message
-                // 提示错误消息
-                showMessage(message, 'error')
-                return
-            }
 
-            showMessage('删除成功')
-            // 重新请求分页接口，渲染数据
-            getTableData()
-        })
-    }).catch(() => {
-        console.log('取消了')
-    })
-}
 // 模糊搜索的文章标题
 const searchArticleTitle = ref('')
 // 日期
 const pickDate = ref('')
-// 是否显示文章发布对话框
-const isArticlePublishEditorShow = ref(false)
-// 发布文章表单引用
-const publishArticleFormRef = ref(null)
-// 表单对象
-const form = reactive({
-    id: null,
-    title: '',
-    content: '请输入内容',
-    cover: '',
-    categoryId: null,
-    tags: [],
-    summary: ""
-})
 
-// 表单校验规则
-const rules = {
-    title: [
-        { required: true, message: '请输入文章标题', trigger: 'blur' },
-        { min: 1, max: 40, message: '文章标题要求大于1个字符，小于40个字符', trigger: 'blur' },
-    ],
-    content: [{ required: true }],
-    cover: [{ required: true }],
-    categoryId: [{ required: true, message: '请选择文章分类', trigger: 'blur' }],
-    tags: [{ required: true, message: '请选择文章标签', trigger: 'blur' }],
-}
 // 查询条件：开始结束时间
 const startDate = reactive({})
 const endDate = reactive({})
@@ -313,10 +243,6 @@ const datepickerChange = (e) => {
 
     console.log('开始时间：' + startDate.value + ', 结束时间：' + endDate.value)
 }
- // 跳转文章详情页
- const goArticleDetailPage = (articleId) => {
-                    router.push('/article/' + articleId)
-                }
 
 const shortcuts = [
     {
@@ -392,6 +318,68 @@ const handleSizeChange = (chooseSize) => {
     size.value = chooseSize
     getTableData()
 }
+
+// 删除文章
+const deleteArticleSubmit = (row) => {
+    console.log(row)
+    showModel('是否确定要删除该文章？').then(() => {
+        deleteArticle(row.id).then((res) => {
+            if (res.success == false) {
+                // 获取服务端返回的错误消息
+                let message = res.message
+                // 提示错误消息
+                showMessage(message, 'error')
+                return
+            }
+
+            showMessage('删除成功')
+            // 重新请求分页接口，渲染数据
+            getTableData()
+        })
+    }).catch(() => {
+        console.log('取消了')
+    })
+}
+
+// 是否显示文章发布对话框
+const isArticlePublishEditorShow = ref(false)
+// 发布文章表单引用
+const publishArticleFormRef = ref(null)
+
+// 表单对象
+const form = reactive({
+    id: null,
+    title: '',
+    content: '请输入内容',
+    cover: '',
+    categoryId: null,
+    tags: [],
+    summary: ""
+})
+
+// 修改文章表单对象
+const updateArticleForm = reactive({
+    id: null,
+    title: '',
+    content: '请输入内容',
+    cover: '',
+    categoryId: null,
+    tags: [],
+    summary: ""
+})
+
+// 表单校验规则
+const rules = {
+    title: [
+        { required: true, message: '请输入文章标题', trigger: 'blur' },
+        { min: 1, max: 40, message: '文章标题要求大于1个字符，小于40个字符', trigger: 'blur' },
+    ],
+    content: [{ required: true }],
+    cover: [{ required: true }],
+    categoryId: [{ required: true, message: '请选择文章分类', trigger: 'blur' }],
+    tags: [{ required: true, message: '请选择文章标签', trigger: 'blur' }],
+}
+
 // 上传文章封面图片
 const handleCoverChange = (file) => {
     // 表单对象
@@ -412,6 +400,25 @@ const handleCoverChange = (file) => {
     })
 }
 
+// 编辑文章：上传文章封面图片
+const handleUpdateCoverChange = (file) => {
+    // 表单对象
+    let formData = new FormData()
+    // 添加 file 字段，并将文件传入 
+    formData.append('file', file.raw)
+    uploadFile(formData).then((e) => {
+        // 响参失败，提示错误消息
+        if (e.success == false) {
+            let message = e.message
+            showMessage(message, 'error')
+            return
+        }
+
+        // 成功则设置表单对象中的封面链接，并提示上传成功
+        updateArticleForm.cover = e.data.url
+        showMessage('上传成功')
+    })
+}
 
 // 编辑器图片上传
 const onUploadImg = async (files, callback) => {
@@ -432,6 +439,7 @@ const onUploadImg = async (files, callback) => {
     );
 }
 
+// 文章分类
 const categories = ref([])
 getCategorySelectList().then((e) => {
     console.log('获取分类数据')
@@ -442,11 +450,11 @@ getCategorySelectList().then((e) => {
 const tagSelectLoading = ref(false)
 // 文章标签
 const tags = ref([])
-
 // 渲染标签数据
 getTagSelectList().then(res => {
     tags.value = res.data
 })
+
 
 // 根据用户输入的标签名称，远程模糊查询
 const remoteMethod = (query) => {
@@ -464,8 +472,10 @@ const remoteMethod = (query) => {
         }).finally(() => tagSelectLoading.value = false) // 隐藏 loading
     }
 }
+
 // 发布文章
 const publishArticleSubmit = () => {
+    // isArticlePublishEditorShow.value = true
     console.log('提交 md 内容：' + form.content)
     // 校验表单
     publishArticleFormRef.value.validate((valid) => {
@@ -497,58 +507,35 @@ const publishArticleSubmit = () => {
         })
     })
 }
-// 修改文章表单对象
-const updateArticleForm = reactive({
-    id: null,
-    title: '',
-    content: '请输入内容',
-    cover: '',
-    categoryId: null,
-    tags: [],
-    summary: ""
-})
 
-// 编辑文章：上传文章封面图片
-const handleUpdateCoverChange = (file) => {
-    // 表单对象
-    let formData = new FormData()
-    // 添加 file 字段，并将文件传入 
-    formData.append('file', file.raw)
-    uploadFile(formData).then((e) => {
-        // 响参失败，提示错误消息
-        if (e.success == false) {
-            let message = e.message
-            showMessage(message, 'error')
-            return
-        }
 
-        // 成功则设置表单对象中的封面链接，并提示上传成功
-        updateArticleForm.cover = e.data.url
-        showMessage('上传成功')
-    })
-}
+// 是否显示编辑文章对话框
+const isArticleUpdateEditorShow = ref(false)
+// 编辑文章表单引用
+const updateArticleFormRef = ref(null)
 // 编辑文章按钮点击事件
 const showArticleUpdateEditor = (row) => {
-            // 显示编辑文章对话框
-            isArticleUpdateEditorShow.value = true
-            // 拿到文章 ID
-            let articleId = row.id
-            getArticleDetail(articleId).then((res) => {
-                if (res.success) {
-                    // 设置表单数据
-                    updateArticleForm.id = res.data.id
-                    updateArticleForm.title = res.data.title
-                    updateArticleForm.cover = res.data.cover
-                    updateArticleForm.content = res.data.content
-                    updateArticleForm.categoryId = res.data.categoryId
-                    updateArticleForm.tags = res.data.tagIds
-                    updateArticleForm.summary = res.data.summary
-                }
-            })
+    // 显示编辑文章对话框
+    isArticleUpdateEditorShow.value = true
+    // 拿到文章 ID
+    let articleId = row.id
+    getArticleDetail(articleId).then((res) => {
+        if (res.success) {
+            // 设置表单数据
+            updateArticleForm.id = res.data.id
+            updateArticleForm.title = res.data.title
+            updateArticleForm.cover = res.data.cover
+            updateArticleForm.content = res.data.content
+            updateArticleForm.categoryId = res.data.categoryId
+            updateArticleForm.tags = res.data.tagIds
+            updateArticleForm.summary = res.data.summary
         }
+    })
+}
 
-        // 保存文章
+// 保存文章
 const updateSubmit = () => {
+    console.log('tijiao')
     updateArticleFormRef.value.validate((valid) => {
         // 校验表单
         if (!valid) {
@@ -573,8 +560,32 @@ const updateSubmit = () => {
         })
     })
 }
-        
+
+
+// 跳转文章详情页
+const goArticleDetailPage = (articleId) => {
+    router.push('/article/' + articleId)
+}
+
+// 点击置顶
+const handleIsTopChange = (row) => {
+    updateArticleIsTop({id: row.id, isTop: row.isTop}).then((res) => {
+        // 重新请求分页接口，渲染列表数据
+        getTableData()
+
+        if (res.success == false) {
+            // 获取服务端返回的错误消息
+            let message = res.message
+            // 提示错误消息
+            showMessage(message, 'error')
+            return
+        }
+
+        showMessage(row.isTop ? '置顶成功' : "已取消置顶")
+    })
+}
 </script>
+
 <style scoped>
 /* 封面图片样式 */
 .avatar-uploader .avatar {
