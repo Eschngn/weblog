@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.Objects;
 
@@ -23,7 +25,7 @@ import java.util.Objects;
  */
 @Component
 @Slf4j
-public class UpdateCommentSubscriber implements ApplicationListener<UpdateCommentEvent> {
+public class UpdateCommentSubscriber  {
 
     @Autowired
     private CommentMapper commentMapper;
@@ -32,8 +34,8 @@ public class UpdateCommentSubscriber implements ApplicationListener<UpdateCommen
     @Autowired
     private MailHelper mailHelper;
 
-    @Override
     @Async("threadPoolTaskExecutor")
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onApplicationEvent(UpdateCommentEvent event) {
         // 在这里处理收到的事件，可以是任何逻辑操作
         Long commentId = event.getCommentId();

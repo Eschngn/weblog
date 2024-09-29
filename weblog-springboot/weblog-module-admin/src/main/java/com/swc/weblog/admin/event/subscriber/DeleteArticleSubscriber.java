@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 /**
  * @author Wilson
@@ -18,15 +20,15 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-public class DeleteArticleSubscriber implements ApplicationListener<DeleteArticleEvent> {
+public class DeleteArticleSubscriber {
 
     @Autowired
     private LuceneHelper luceneHelper;
     @Autowired
     private AdminStatisticsService statisticsService;
 
-    @Override
     @Async("threadPoolTaskExecutor")
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onApplicationEvent(DeleteArticleEvent event) {
         // 在这里处理收到的事件，可以是任何逻辑操作
         Long articleId = event.getArticleId();
