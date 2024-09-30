@@ -6,6 +6,7 @@ import com.swc.weblog.common.domain.mapper.StatisticsArticlePVMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
@@ -28,7 +29,7 @@ public class ReadArticleSubscriber  {
 
 
     @Async("threadPoolTaskExecutor")
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @EventListener
     public void onApplicationEvent(ReadArticleEvent event) {
         // 在这里处理收到的事件，可以是任何逻辑操作
         Long articleId = event.getArticleId();
