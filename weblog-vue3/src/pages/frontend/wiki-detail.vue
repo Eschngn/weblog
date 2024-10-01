@@ -24,7 +24,7 @@
                                     <!-- 一级目录标题 -->
                                     <span class="flex items-center" v-html="catalog.title"></span>
                                     <!-- 箭头 -->
-                                    <svg data-accordion-icon class="w-3 h-3 rotate-90 transition-all shrink-0"
+                                    <svg data-accordion-icon  class="w-3 h-3 rotate-90 transition-all shrink-0  "
                                         aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
                                         viewBox="0 0 10 6">
                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
@@ -249,9 +249,7 @@ import { getWikiArticlePreNext, getWikiCatalogs } from '@/api/frontend/wiki'
 import hljs from 'highlight.js/lib/common'
 import 'highlight.js/styles/tokyo-night-dark.css'
 import ScrollToTopButton from '@/layouts/frontend/components/ScrollToTopButton.vue'
-import {
-    initAccordions,
-} from 'flowbite'
+import {initAccordions} from 'flowbite'
 import Comment from '@/components/Comment.vue'
 
 onMounted(() => {
@@ -776,10 +774,7 @@ const shrinkAndExpand = () => {
     mask-image: var(--copied-icon);
 }
 
-.rotate-180 {
-    --tw-rotate: 180deg;
-    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-}
+
 
 /* 收缩、展开箭头样式 */
 .left-toc-sidebar {
@@ -812,5 +807,14 @@ const shrinkAndExpand = () => {
 /* 暗黑主题下箭头 */
 html[class=dark] .left-toc-sidebar .arrow {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='rgba(255,255,255,0.5)' d='M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z'/%3E%3C/svg%3E");
+}
+
+.rotate-90 {
+    --tw-rotate: 180deg;
+    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+.rotate-180 {
+    --tw-rotate: 90deg;
+    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 </style>
