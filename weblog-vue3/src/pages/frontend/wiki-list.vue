@@ -13,8 +13,8 @@
                     <div v-if="wikis && wikis.length > 0" v-for="(wiki, index) in wikis" :key="index" class="col-span-12 md:col-span-6 lg:col-span-4 animate__animated animate__fadeInUp">
                         <div 
                             class="relative bg-white h-full border border-gray-200 rounded-lg hover:scale-[1.03] dark:bg-gray-800 dark:border-gray-700">
-                             <!-- 知识库封面 -->
-                             <a @click="goWikiArticleDetailPage(wiki.id, wiki.firstArticleId)" class="cursor-pointer">
+                            <!-- 知识库封面 -->
+                            <a @click="goWikiArticleDetailPage(wiki.id, wiki.firstArticleId)" class="cursor-pointer">
                                 <img class="rounded-t-lg h-36 w-full"
                                 :src="wiki.cover" />
                             </a>
@@ -90,4 +90,3 @@ const goWikiArticleDetailPage = (wikiId, articleId) => {
     router.push({path: '/wiki/' + wikiId, query: {articleId}})
 }
 </script>
-
