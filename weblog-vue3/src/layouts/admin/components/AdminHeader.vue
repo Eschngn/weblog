@@ -48,7 +48,7 @@
                 <span class="el-dropdown-link flex items-center justify-center text-gray-700 text-xs">
                     <!-- 头像 Avatar -->
                     <el-avatar class="mr-2" :size="25"
-                        src="http://47.96.98.131:9000/weblog/chengliuxiang.jpg" />
+                        src="https://img.chengliuxiang.cn/weblog/chengliuxiang.jpg" />
                         {{ userStore.userInfo.username }}
                     <el-icon class="el-icon--right">
                         <arrow-down />
