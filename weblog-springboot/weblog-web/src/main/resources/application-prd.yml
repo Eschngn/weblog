@@ -24,7 +24,7 @@ spring:
 # minio (上传图片需要，需配置成自己的地址)
 #=================================================================
 minio:
-  endpoint: http://47.96.98.131:9000
+  endpoint: https://img.chengliuxiang.cn
   accessKey: xiaocheng
   secretKey: xiaocheng
   bucketName: weblog
