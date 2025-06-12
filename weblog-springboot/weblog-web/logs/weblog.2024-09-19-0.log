@@ -1,7 +1,0 @@
-2024-09-19 10:37:53.284 [main] INFO  com.swc.weblog.web.WeblogWebApplicationTests - Starting WeblogWebApplicationTests using Java 1.8.0_401 on Ethereal with PID 21232 (started by Summer Snow in E:\Code\Projects\weblog-springboot\weblog-web)
-2024-09-19 10:37:53.285 [main] INFO  com.swc.weblog.web.WeblogWebApplicationTests - The following profiles are active: prd
-2024-09-19 10:37:54.335 [main] INFO  com.swc.weblog.web.WeblogWebApplicationTests - Started WeblogWebApplicationTests in 1.466 seconds (JVM running for 2.292)
-2024-09-19 10:37:54.504 [main] INFO  com.swc.weblog.web.WeblogWebApplicationTests - 这是一行 Info 级别日志
-2024-09-19 10:37:54.504 [main] WARN  com.swc.weblog.web.WeblogWebApplicationTests - 这是一行 Warn 级别日志
-2024-09-19 10:37:54.506 [main] ERROR com.swc.weblog.web.WeblogWebApplicationTests - 这是一行 Error 级别日志
-2024-09-19 10:37:54.506 [main] INFO  com.swc.weblog.web.WeblogWebApplicationTests - 这是一行带有占位符日志，作者：swc
